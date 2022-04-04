@@ -2,7 +2,7 @@
 
 function CheckAgainstDatabase(?string $key): bool
 {
-    $username = $_GET["username"] ?? null;
+    $username = $_POST["username"] ?? $_GET["username"] ?? null;
     if ($username !== null) {
         try {
             $dbCon = connect_MySQL_DB();
@@ -48,8 +48,9 @@ function ApiKeyPass(?string $key, ?string $site): bool
 
 function AddUsageLog(?string $logDetail, ?int $bytesSent): bool
 {
-    $apikey = $_GET["apikey"] ?? null;
-    if (($apikey !== null) && (($_GET["username"] ?? null) !== null) && ($bytesSent > 0)) {
+    $apikey = $_POST["apikey"] ?? $_GET["apikey"] ?? null;
+    $username = $_POST["username"] ?? $_GET["username"] ?? null;
+    if (($apikey !== null) && ($username  !== null) && ($bytesSent > 0)) {
         try {
             $sql = "INSERT INTO usage_log(apikey, detail, numbytes, use_date_time) VALUE (:apikey,:detail,:numbytes,NOW())";
             $con = connect_MySQL_DB();
