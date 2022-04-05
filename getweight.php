@@ -59,8 +59,9 @@ function main()
         if (ApiKeyPass($key, $site)) {
             $site = mb_strtoupper($site);
 
-            $resJson = json_encode(getWeightData($site, $weightMachineNo, $palletNo));
-            $weightResult = $resJson['weightresult'] ?? 0.00;
+            $weightData = getWeightData($site, $weightMachineNo, $palletNo);
+            $resJson = json_encode($weightData);
+            $weightResult = $weightData['weight'] ?? 0.00;
             if (($resJson['error'] ?? null) === null)
                 $logType = "Get: $site, $weightMachineNo, $palletNo => wt = $weightResult";
             else
