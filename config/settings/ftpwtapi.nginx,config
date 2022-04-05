@@ -1,0 +1,22 @@
+server {
+    server_name pacm.webredirect.org;
+    root /var/www/ftpwtapi;
+
+    index index.html index.htm index.php;
+
+    location / {
+        # try_files $uri $uri/ =404;
+	try_files $uri $uri/ $uri.html $uri.php$is_args$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+     }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    listen 80;
+}
