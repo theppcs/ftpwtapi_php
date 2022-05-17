@@ -88,28 +88,32 @@ class FtpWeight
 
     private function getFileFTP(FtpConfig $ftpConfig): bool
     {
-        // set SFTP object, use host, username and password
-        $ftp = new SimpleFTP($ftpConfig->ftp_url, $ftpConfig->ftp_username, $ftpConfig->ftp_password, $ftpConfig->ftp_port);
-        // connect to FTP server
-        $ftp->passive = true;
-        if ($ftp->connect()) {
-            if ($ftp->cd($ftpConfig->ftp_filepath)) {
-                //$ls = $ftp->ls();
-                //$size = $ftp->filesize($ftpConfig->ftp_filename);
-                ob_start();
-                //if (1 === 1) { // 
-                // if ($ftp->get($ftpConfig->ftp_filename, self::localFileName, FTP_BINARY)) {
-                //     $data = file_get_contents(self::localFileName);
-                // }
-                if ($ftp->get($ftpConfig->ftp_filename, "php://output", FTP_BINARY)) {
-                    $data = ob_get_contents();
-                    ob_end_clean();
+        try {
+            // set SFTP object, use host, username and password
+            $ftp = new SimpleFTP($ftpConfig->ftp_url, $ftpConfig->ftp_username, $ftpConfig->ftp_password, $ftpConfig->ftp_port);
+            // connect to FTP server
+            $ftp->passive = true;
+            if ($ftp->connect()) {
+                if ($ftp->cd($ftpConfig->ftp_filepath)) {
+                    //$ls = $ftp->ls();
+                    //$size = $ftp->filesize($ftpConfig->ftp_filename);
+
+                    //th20220517 fix bug when the file is too big so it cannot use the php://output
+                    if ($ftp->get($ftpConfig->ftp_filename, self::localFileName, FTP_BINARY)) {
+                        $data = file_get_contents(self::localFileName);
+                    }
+                    // ob_start();
+                    // if ($ftp->get($ftpConfig->ftp_filename, "php://output", FTP_BINARY)) {
+                    //     $data = ob_get_contents();
+                    //     ob_end_clean();
+                    // }
                 }
             }
-        }
-        if ($data) {
-            $this->ftp_data = $data; //$this->utf16_decode($data);
-            return true;
+            if ($data) {
+                $this->ftp_data = $data; //$this->utf16_decode($data);
+                return true;
+            }
+        } catch (Exception $e) {
         }
         return false;
     }
