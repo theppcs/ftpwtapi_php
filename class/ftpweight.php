@@ -140,12 +140,24 @@ class FtpWeight
                     $result['palletno'] = $lineArray[4];
 
                     if ($result['palletno'] === $palletno) {
-                        return $result;
+                        //th20220620 also check the date
+                        //ต้องไม่เกิน 30 นาที
+                        $dataDate = MyStrToDateTime(MyStrToDateStr($result['dateDMY']) . ' ' . $result['timeHMS']);
+                        if ($dataDate) {
+                            $diff = date_diff(NowWTZ(), $dataDate);
+                            $total_minutes = ($diff->days * 24 * 60);
+                            $total_minutes += ($diff->h * 60);
+                            $total_minutes += $diff->i;
+                            if ($total_minutes <= 30)
+                                return $result;
+                            else
+                                break;
+                        }
                     }
                 }
             }
             $acount++;
-            if ($acount > 20) {
+            if ($acount > 100) { //th20220608 เพิ่มจำนวนในการหาย้อนในไฟล์ จากเดิม 20 บรรทัด
                 break;
             }
         }

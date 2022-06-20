@@ -69,11 +69,15 @@ function MyStrToDateTime(?string $str): ?DateTime
 {
     if (IsNullOrEmptyString($str))
         return null;
-    $dateTime = new \DateTime(
-        $str,
-        new \DateTimeZone(Globals::$AppTimeZone)
-    );
-    return $dateTime;
+    try {
+        $dateTime = new \DateTime(
+            $str,
+            new \DateTimeZone(Globals::$AppTimeZone)
+        );
+        return $dateTime;
+    } catch (Exception $e) {
+        return null;
+    }
 }
 //Now with Timezone
 function NowWTZ($dateOnly = false)
